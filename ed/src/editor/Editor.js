@@ -2,22 +2,22 @@ import React from 'react';
 import {connect} from 'react-redux';
 import Spinner from 'react-spinkit';
 
-import {requestItem, enterEditor, leaveEditor, patchItem, EDITOR_REQUEST_NONE} from './ducks';
+import {selectEntity, fetchEntityRequest} from '../api/ducks';
+
+import {enterEditor, leaveEditor, submitForm} from './ducks';
 import EventForm from './EventForm';
 import GroupForm from './GroupForm';
 
 
-function submitPatch({itemType, id, initial, email, token}) {
-  console.log({itemType, id, initial, email, token});
+function submitFormClosure({itemType, id, initial}) {
   return function(data, dispatch) {
     return new Promise((resolve, reject) => {
-      dispatch(patchItem({
+      dispatch(submitForm({
         itemType,
         id,
         initial,
         data,
         defer: {resolve, reject},
-        options: {email, token}
       }));
     });
   };
@@ -25,18 +25,18 @@ function submitPatch({itemType, id, initial, email, token}) {
 
 function mapStateToProps(state, props) {
   const {itemType, id} = props.params;
-  const {email, token} = props.location.query;
-  const {initial, request, entered} = state.editor[itemType];
-  const item = state.api[itemType][id] || null;
+
+  const entityRequest = selectEntity(state.api, {itemType, id});
+
+  const {initial, entered} = state.editor[itemType];
+
   return {
     itemType,
     id,
-    item,
+    entityRequest: entityRequest,
     initial,
-    request,
     entered,
-    email, token,
-    submitPatch: submitPatch({itemType, id, initial, email, token})
+    submitForm: submitFormClosure({itemType, id, initial})
   }
 }
 
@@ -44,7 +44,7 @@ function mapDispatchToProps(dispatch, props) {
   const {itemType, id} = props.params;
 
   return {
-    requestItem: () => dispatch(requestItem(itemType, id)),
+    requestEntity: () => dispatch(fetchEntityRequest(itemType, id)),
     enterEditor: (item) => dispatch(enterEditor(itemType, item)),
     leaveEditor: () => dispatch(leaveEditor(itemType)),
   }
@@ -62,20 +62,25 @@ class Editor extends React.Component {
   // item: la copie cachée de l'item telle qu'elle existe,
   // initial: la copie sur laquelle l'édition a démarrée,
   // request: y a-t-il une requête prévue ?,
-  // entered: l'édition a-t-elle commencée ?
+  // entered: l'édition a-t-elle commencé ?
   // }
 
-  dispatchAll() {
-    if (this.props.item === null && this.props.request === EDITOR_REQUEST_NONE) {
-      this.props.requestItem();
+  dispatchAll(force = false) {
+    const {entityRequest, entered, requestEntity, enterEditor} = this.props;
+
+    if (!entityRequest || (!entityRequest.pending && !entityRequest.lastRequestSuccessful && force)) {
+      requestEntity();
     }
-    if (!this.props.entered && this.props.item !== null) {
-      this.props.enterEditor(this.props.item);
+
+    if (!entered && entityRequest && entityRequest.payload) {
+      enterEditor(entityRequest.payload);
     }
   }
 
+  // rajouter componentWillReceiveProps pour gérer le changement d'id
+
   componentDidMount() {
-    this.dispatchAll();
+    this.dispatchAll(true);
   }
 
   componentDidUpdate() {
@@ -87,11 +92,12 @@ class Editor extends React.Component {
   }
 
   render() {
-    const Component = components[this.props.itemType];
+    const {initial, entered, itemType, submitForm} = this.props;
+    const Component = components[itemType];
 
-    if (this.props.entered) {
+    if (entered) {
       return <div className="container">
-        <Component initialValues={this.props.initial} submitPatch={this.props.submitPatch} />
+        <Component initialValues={initial} submitPatch={submitForm} />
       </div>
     } else {
       return <Spinner spinnerName='three-bounce' noFadeIn/>;

@@ -1,4 +1,5 @@
-import {hashHistory} from 'react-router'
+  import {hashHistory} from 'react-router'
+  import fi from '@fi/api-client';
 
 /**
  * Array of searchable item types.
@@ -10,20 +11,29 @@ import {hashHistory} from 'react-router'
  *
  * @type {[*]}
  */
-export const ITEM_TYPES = [
+export const itemTypes = [
   {
     value: 'groupes',
     label: 'groupe d\'appui',
-    labelPlural: "groupes d'appui",
-    apiName: 'groups',
+    labelPlural: 'groupes d\'appui',
+    apiName: 'allGroups',
+    publicApiName: 'groups',
     searchOptions: {}
   },
   {
     value: 'evenements',
     label: 'événement local',
     labelPlural: 'événements locaux',
-    apiName: 'events',
+    apiName: 'allEvents',
+    publicApiName: 'events',
     searchOptions: {agenda: 'evenements_locaux'}
+  },
+  {
+    value: 'people',
+    label: 'personne',
+    labelPlural: 'personnes',
+    apiName: 'people',
+    searchOptions: {}
   }
 ];
 
@@ -33,7 +43,7 @@ export const ITEM_TYPES = [
  *
  * @type {*}
  */
-export const ITEM_TYPES_MAP = ITEM_TYPES.reduce(function(map, it) {
+export const itemTypesMap = itemTypes.reduce(function(map, it) {
   map[it.value] = it;
   return map;
 }, {});
@@ -44,6 +54,11 @@ export const ITEM_TYPES_MAP = ITEM_TYPES.reduce(function(map, it) {
  */
 export const API_RO_ENDPOINT = "http://api.redado.dev";
 export const API_RW_ENDPOINT = "http://localhost:5001";
+
+export const apiClient = fi.createClient({
+  endpoint: API_RW_ENDPOINT,
+  auth: 'crossSiteSession'
+});
 
 /**
  * The base location of the zipcode API
@@ -60,3 +75,5 @@ export const ZIPCODE_ENDPOINT = "https://api-adresse.data.gouv.fr";
 export const HISTORY_HANDLER = hashHistory;
 
 export const NB_ITEMS_PER_PAGE = 5;
+
+export const REQUEST_CACHE_SIZE = 20;

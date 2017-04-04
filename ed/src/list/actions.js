@@ -1,35 +1,36 @@
+export const actions = {
+  LIST_REQUEST: "ed/list/request",
+  LIST_REQUEST_ERROR: "ed/list/request/error",
+  LIST_REQUEST_SUCCESS: "ed/list/request/success",
+  LIST_REQUEST_LONG: "ed/list/request/long",
+};
 
-export const LIST_REQUEST = "ed/list/request";
-export const LIST_REQUEST_ERROR = "ed/list/request/error";
-export const LIST_REQUEST_SUCCESS = "ed/list/request/success";
-export const LIST_REQUEST_LONG = "ed/list/request/long";
 
-
-export function list_request(itemType) {
+export function listRequest(itemType) {
   return {
-    type: LIST_REQUEST,
+    type: actions.LIST_REQUEST,
     itemType
   };
 }
 
-export function list_request_success(itemType, items) {
+export function listRequestSuccess(itemType, items) {
   return {
-    type: LIST_REQUEST_SUCCESS,
+    type: actions.LIST_REQUEST_SUCCESS,
     itemType,
     items
   }
 }
 
-export function list_request_error(itemType) {
+export function listRequestError(itemType) {
   return {
-    type: LIST_REQUEST_ERROR,
+    type: actions.LIST_REQUEST_ERROR,
     itemType
   }
 }
 
-export function list_request_long(itemType) {
+export function listRequestLong(itemType) {
   return {
-    type: LIST_REQUEST_LONG,
+    type: actions.LIST_REQUEST_LONG,
     itemType
   }
 }

@@ -9,19 +9,28 @@ import moment from 'moment';
 
 import App from './app/App';
 import './index.css';
-import apiReducer from './api/reducers';
+
+// reducers
+import appReducer from './app/ducks';
+import apiReducer from './api/ducks';
 import listReducer from './list/reducers';
-import listSaga from './list/sagas';
 import editorReducer from './editor/ducks';
+import messagesReducer from './messages/ducks';
+
+// sagas
+import appSaga from './app/sagas';
+import apiSaga from './api/sagas';
 import editorSaga from './editor/sagas';
 
 moment.locale('fr');
 
 const reducer = combineReducers({
+  app: appReducer,
   api: apiReducer,
   list: listReducer,
   editor: editorReducer,
-  form: formReducer
+  form: formReducer,
+  messages: messagesReducer
 });
 
 const loggerMiddleware = createLogger();
@@ -29,10 +38,11 @@ const sagaMiddleware = createSagaMiddleware();
 
 const store = createStore(
   reducer,
-  applyMiddleware(sagaMiddleware, loggerMiddleware)
+  applyMiddleware(loggerMiddleware, sagaMiddleware)
 );
 
-sagaMiddleware.run(listSaga);
+sagaMiddleware.run(appSaga);
+sagaMiddleware.run(apiSaga);
 sagaMiddleware.run(editorSaga);
 
 ReactDOM.render(

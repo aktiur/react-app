@@ -1,35 +1,17 @@
-import deepEqual from 'deep-equal';
 import {combineReducers} from 'redux';
+import _ from 'lodash/lang'
 
-import {ITEM_TYPES} from '../conf';
+import {itemTypes} from '../conf';
 
-const EDITOR_ENTER = "ed/editor/ENTER";
-const EDITOR_LEAVE = "ed/editor/LEAVE";
-export const ITEM_REQUEST = "ed/editor/REQUEST";
-const ITEM_REQUEST_SUCCESS = "ed/editor/REQUEST/SUCCESS";
-const ITEM_REQUEST_ERROR = "ed/editor/REQUEST/ERROR";
-
-export const ITEM_PATCH_REQUEST = "ed/editor/PATCH/";
-const ITEM_PATCH_SUCCESS = "ed/editor/PATCH/success";
-const ITEM_PATCH_ERROR = "ed/editor/PATCH/error";
-
-export function requestItemSuccess(itemType, item) {
-  return {
-    type: ITEM_REQUEST_SUCCESS,
-    itemType,
-  };
-}
-
-export function requestItemError(itemType) {
-  return {
-    type: ITEM_REQUEST_ERROR,
-    itemType,
-  };
-}
+export const actions = {
+  EDITOR_ENTER: "ed/editor/ENTER",
+  EDITOR_LEAVE: "ed/editor/LEAVE",
+  FORM_SUBMIT: "ed/editor/SUBMIT"
+};
 
 export function enterEditor(itemType, item) {
   return {
-    type: EDITOR_ENTER,
+    type: actions.EDITOR_ENTER,
     itemType,
     item
   }
@@ -37,37 +19,26 @@ export function enterEditor(itemType, item) {
 
 export function leaveEditor(itemType) {
   return {
-    type: EDITOR_LEAVE,
+    type: actions.EDITOR_LEAVE,
     itemType
   };
 }
 
-export function requestItem(itemType, id) {
+export function submitForm(payload) {
   return {
-    type: ITEM_REQUEST,
-    itemType,
-    id
-  }
-}
-
-export function patchItem(payload) {
-  return {
-    type: ITEM_PATCH_REQUEST,
+    type: actions.FORM_SUBMIT,
     ...payload
   };
 }
 
-
-export const EDITOR_REQUEST_NONE = 'ed/editor/request/none';
-const EDITOR_REQUEST_STARTED = 'ed/editor/request/started';
-const EDITOR_REQUEST_SUCCESS = 'ed/editor/request/success';
-const EDITOR_REQUEST_ERROR = 'ed/editor/request/error';
-
 const initialState = {
   initial: null,
-  request: EDITOR_REQUEST_NONE,
   entered: false,
 };
+
+export function selectFormInformation(state, itemType){
+  return state[itemType];
+}
 
 function createReducer(itemType) {
   return function commonEditorReducer(state = initialState, action) {
@@ -76,30 +47,22 @@ function createReducer(itemType) {
     }
 
     switch (action.type) {
-      case ITEM_REQUEST:
-        return Object.assign({}, state, {request: EDITOR_REQUEST_STARTED});
-      case ITEM_REQUEST_SUCCESS:
-        return Object.assign({}, state, {request: EDITOR_REQUEST_SUCCESS});
-      case ITEM_REQUEST_ERROR:
-        return Object.assign({}, state, {request: EDITOR_REQUEST_ERROR});
-      case EDITOR_ENTER:
-        if (deepEqual(state.item, action.item)) {
+      case actions.EDITOR_ENTER:
+        if (_.isEqual(state.item, action.item)) {
           return state;
         } else {
           return Object.assign({}, state, {initial: action.item, entered: true})
         }
-      case EDITOR_LEAVE:
-        return Object.assign({}, state, {initial: null, request: EDITOR_REQUEST_NONE, entered: false});
+      case actions.EDITOR_LEAVE:
+        return Object.assign({}, state, {initial: null, entered: false});
       default:
         return state;
     }
   };
 }
 
-const reducerMaps = {
-  'people': createReducer('people')
-};
-for (let itemType of ITEM_TYPES) {
+const reducerMaps = {};
+for (let itemType of itemTypes) {
   reducerMaps[itemType.value] = createReducer(itemType.value);
 }
 

@@ -4,7 +4,7 @@ import {Link} from 'react-router';
 import logo from './logo-orange-bleu.png'
 
 export default function Menu(props) {
-  const {query} = props;
+  const {query, user} = props;
 
   return (
     <nav className="navbar navbar-default navbar-static-top" role="navigation">
@@ -24,7 +24,7 @@ export default function Menu(props) {
           <ul id="menu-menu-principal" className="nav navbar-nav navbar-right">
             <li><Link to={{pathname: "/evenements/", query}}>Mes événements</Link></li>
             <li><Link to={{pathname: "/groupes/", query}}>Mes groupes</Link></li>
-            <li><Link to={{pathname: "/", query}}>Mon profil</Link></li>
+            <li><Link to={{pathname: "/", query}}>{user.email}</Link></li>
           </ul>
         </div>
       </div>

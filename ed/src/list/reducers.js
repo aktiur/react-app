@@ -2,7 +2,7 @@ import {combineReducers} from 'redux';
 import moment from 'moment';
 
 import * as actions from './actions';
-import {ITEM_TYPES} from '../conf'
+import {itemTypes} from '../conf'
 
 export const REQUEST_STATUS_NONE = "none";
 export const REQUEST_STATUS_PROGRESS = "progress";
@@ -39,7 +39,7 @@ function createReducer(itemType) {
 }
 
 const reducerMaps = {};
-for (let itemType of ITEM_TYPES) {
+for (let itemType of itemTypes) {
   reducerMaps[itemType.value] = createReducer(itemType.value);
 }
 

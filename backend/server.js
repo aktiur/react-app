@@ -54,7 +54,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 app.use(session({secret: 'huigjergroej'}));
 app.use(passport.initialize());
 app.use(passport.session());
